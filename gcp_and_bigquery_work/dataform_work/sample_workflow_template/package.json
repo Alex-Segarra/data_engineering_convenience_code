@@ -1,0 +1,7 @@
+{
+    "name": "TEST_Workflow",
+    "dependencies": {
+      "@dataform/core": "2.0.1"
+    }
+  }
+  

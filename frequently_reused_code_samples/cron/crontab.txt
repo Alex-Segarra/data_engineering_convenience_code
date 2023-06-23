@@ -1,0 +1,46 @@
+# Alex's Shamelessly ripped off template!!!!!
+#--------------------------------------------------
+# example unix/linux crontab file format:
+#--------------------------------------------------
+# min,hour,dayOfMonth,month,dayOfWeek command
+#
+# field          allowed values
+# -----          --------------
+# minute         0-59
+# hour           0-23
+# day of month   1-31
+# month          1-12 (or names, see below)
+# day of week    0-7 (0 or 7 is Sun, or use names)
+#
+#--------------------------------------------------
+##   Entry              Description     Equivalent To
+##   @yearly (or @annually)     Run once a year at midnight in the morning of January 1         0 0 1 1 *
+##   @monthly   Run once a month at midnight in the morning of the first of the month   0 0 1 * *
+##   @weekly    Run once a week at midnight in the morning of Sunday    0 0 * * 0
+##   @daily             Run once a day at midnight      0 0 * * *
+##   @hourly    Run once an hour at the beginning of the hour   0 * * * *
+##   @reboot    Run at startup  @reboot
+##   
+##   *    *    *    *    *  command to be executed
+##   ┬    ┬    ┬    ┬    ┬
+##   │    │    │    │    │
+##   │    │    │    │    │
+##   │    │    │    │    └───── day of week (0 - 7) (0 or 7 are Sunday, or use names)
+##   │    │    │    └────────── month (1 - 12)
+##   │    │    └─────────────── day of month (1 - 31)
+##   │    └──────────────────── hour (0 - 23)
+##   └───────────────────────── min (0 - 59)
+##   
+##   
+##   
+##   The following example will run each 10 minutes
+##   */10 * * * * /usr/bin/somedirectory/somecommand
+
+##   Disable E-mail notifications
+MAILTO="alex.segarra@pearson.com"
+
+##   Set where to look for executable files
+PATH=/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin:$PATH:/usr/bin/python3:/Users/USEGAAL/Downloads/google-cloud-sdk/bin
+BOTO_CONFIG="/Users/USEGAAL/.config/gcloud/legacy_credentials/alex.segarra@pearson.com/.boto"
+
+* */2 * * * /usr/bin/python3 /Users/USEGAAL/projects/nic/nic_textel_load_script.py >> /Users/USEGAAL/projects/nic/nic_cronjob.log 2>&1
