@@ -10,7 +10,7 @@ s3_nac='s3://s3_bucket/nac_folder/'
 touch ${hs_output_dir}hs_time_ref.txt
 touch ${nac_output_dir}nac_tim_ref.txt
 
-#Pulls shit from S3
+#Pulls stuff from S3
 aws s3 cp $s3_hs $hs_output_dir --recursive --profile s3_bucket_creds
 aws s3 cp $s3_nac $nac_output_dir --recursive --profile s3_bucket_creds
 
