@@ -1,0 +1,4 @@
+project,schema,table,action
+polsbigquery,skunkworks,test_table_1,delete
+polsbigquery,skunkworks,test_table_2,delete
+polsbigquery,skunkworks,test_table_3,delete
