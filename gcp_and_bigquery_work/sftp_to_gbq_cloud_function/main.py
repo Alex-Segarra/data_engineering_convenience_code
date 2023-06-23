@@ -13,7 +13,7 @@ def  functions_iex_reports_sftp_pull (data,context):
     import re
 
 
-    PROJECT_ID = '1234553451' #polsnadna-nonprd'
+    PROJECT_ID = '1234553451' 
     secret_id = 'secret_sftp_export_credentials'
     version_id = 'latest'
     bucket = "sftp_bucket_exports"
