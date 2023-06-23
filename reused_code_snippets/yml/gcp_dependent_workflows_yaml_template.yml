@@ -1,0 +1,113 @@
+# This YAML is meant to be used for workflows that depend on a prior Workflow to trigger it.
+# This does not send a "success message."  It only sends messages to PubSub when it fails.
+# Syntax is here:  
+# https://cloud.google.com/workflows/docs/reference/syntax/syntax-search
+# https://cloud.google.com/workflows/docs/reference/googleapis/pubsub/Overview
+main:
+    steps:
+    - init:
+        assign:
+            - failureTopic: pubsub_topic_dataform_failure
+            - dataformWorkflowName: dataform_example
+            - project: project_id
+            - location: us-central1
+            - repository: ${"projects/"+ project + "/locations/" + location + "/repositories/" + dataformWorkflowName}
+            # Default message assignment needed when catching error messages
+            - message: DEFAULT_MESSAGE
+            - base64Msg: ${base64.encode(json.encode(message))}
+    - createCompilationResult:
+        try:
+            call: http.post
+            args:
+                url: ${"https://dataform.googleapis.com/v1beta1/" + repository + "/compilationResults"}
+                auth:
+                    type: OAuth2
+                body:
+                    gitCommitish: main
+            result: compilationResult
+        except:
+          as: e
+          steps:
+            - formCompErrorMessage:
+                assign:
+                    - message: {Name: "${dataformWorkflowName}", Stage: "Compilation" , Status: "ERROR", errorMsg: "${e}"}
+                    - base64Msg: ${base64.encode(json.encode(message))}
+                next: publish_message_to_topic_failure
+    - createWorkflowInvocation:
+        try:
+            call: http.post
+            args:
+                url: ${"https://dataform.googleapis.com/v1beta1/" + repository + "/workflowInvocations"}
+                auth:
+                    type: OAuth2
+                body:
+                    compilationResult: ${compilationResult.body.name}
+            result: workflowInvocation
+        except:
+          as: e
+          steps:
+            - formInvErrorMessage:
+                assign:
+                    - message: {Name: "${dataformWorkflowName}", Stage: "Compilation" , Status: "ERROR", errorMsg: "${e}"}
+                    - base64Msg: ${base64.encode(json.encode(message))}
+                next: publish_message_to_topic_failure
+    - formatWorkflowInvocationActionText:
+        assign:
+            - actionText: ${workflowInvocation.body.name}
+            - urlTxt:  ${"https://dataform.googleapis.com/v1beta1/" + actionText}
+    - queryWorkflowInvocationActions:
+        call: http.get
+        args:
+            #url: ${"https://dataform.googleapis.com/v1beta1/" + repository + "/workflowInvocations"}
+            url: ${urlTxt}
+            auth:
+                type: OAuth2
+        result: workflowInvocation
+    - checkStatus:
+        switch:
+            - condition: ${workflowInvocation.body.state == "SUCCEEDED"}
+              next: logStep
+            - condition: ${workflowInvocation.body.state == "FAILED"}
+              assign:
+                #- message: {results: FAILED}
+                - message: {Name: "${dataformWorkflowName}", Workflow: '${workflowInvocation.body.name}', Status: '${workflowInvocation.body.state}'}
+                - base64Msg: ${base64.encode(json.encode(message))}
+              next: prepareToQueryFailedJob
+        next: waitForTenSeconds
+    - waitForTenSeconds:
+        call: sys.sleep
+        args:
+            seconds: 10
+        next: queryWorkflowInvocationActions
+    - prepareToQueryFailedJob:
+        assign:
+            - actionText: ${workflowInvocation.body.name}
+            - urlTxt:  ${"https://dataform.googleapis.com/v1beta1/" +actionText + ":query"}
+        next: queryFailedJob
+    - queryFailedJob:
+        call: http.get
+        args:
+            #url: ${"https://dataform.googleapis.com/v1beta1/{parent=projects/*/locations/*/repositories/*}/workflowInvocations" + repository + "/workflowInvocations"}
+            url: ${urlTxt}
+            auth:
+                type: OAuth2
+        result: workflowInvocations
+        next: buildErrorMessage
+    - buildErrorMessage:
+        assign:
+            - message: {Name: "${dataformWorkflowName}", Stage: "Compilation" , Status: "ERROR", JobQuery: "${workflowInvocations.body.workflowInvocationActions}"}
+            - base64Msg: ${base64.encode(json.encode(message))}
+        next: publish_message_to_topic_failure
+    - publish_message_to_topic_failure:
+        call: googleapis.pubsub.v1.projects.topics.publish
+        args:
+            topic: ${"projects/" + project + "/topics/" + failureTopic}
+            body:
+                messages:
+                    data: ${base64Msg}
+        next: logStep
+    - logStep:
+        call: sys.log
+        args:
+            text: ${message}
+            severity: INFO

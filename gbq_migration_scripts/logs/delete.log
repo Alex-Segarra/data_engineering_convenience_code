@@ -1,0 +1,28 @@
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+table_id: test_table_1
+path: /projects/project1/datasets/skunkworks/tables/test_table_1
+num_rows: 1
+num_bytes: 8
+modified: 2023-06-22 22:07:34.675000+00:00
+created: 2023-06-22 22:07:34.674000+00:00
+schema: [SchemaField('date', 'DATE', 'NULLABLE', None, None, (), None)]
+Table Action: Deleted project1.skunkworks.test_table_1 at 2023-06-22T22:11:48.112070.
+-----------------------------------------------------------------------------------------------------------------------------------------------
+table_id: test_table_2
+path: /projects/project1/datasets/skunkworks/tables/test_table_2
+num_rows: 1
+num_bytes: 8
+modified: 2023-06-22 22:07:35.195000+00:00
+created: 2023-06-22 22:07:35.194000+00:00
+schema: [SchemaField('date', 'DATE', 'NULLABLE', None, None, (), None)]
+Table Action: Deleted project1.skunkworks.test_table_2 at 2023-06-22T22:11:48.537223.
+-----------------------------------------------------------------------------------------------------------------------------------------------
+table_id: test_table_3
+path: /projects/project1/datasets/skunkworks/tables/test_table_3
+num_rows: 1
+num_bytes: 8
+modified: 2023-06-22 22:07:35.484000+00:00
+created: 2023-06-22 22:07:35.483000+00:00
+schema: [SchemaField('date', 'DATE', 'NULLABLE', None, None, (), None)]
+Table Action: Deleted project1.skunkworks.test_table_3 at 2023-06-22T22:11:48.948397.

@@ -1,0 +1,1 @@
+Purpose:  Scrapes an instance of GBQ, identifies views, and saves each view's DDL to a text file along with current view metadata.
